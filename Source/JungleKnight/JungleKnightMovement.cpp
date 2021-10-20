@@ -98,7 +98,7 @@ void UJungleKnightMovement::ReceiveForwardInput(float Value)
 		WalkForward(Value);
 		break;
 	case EKS_Climbing:
-		Climb(Value);
+		ClimbUp(Value);
 		break;
 	}
 }
