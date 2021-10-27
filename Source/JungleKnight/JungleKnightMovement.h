@@ -67,6 +67,8 @@ protected:
 
 	void ClimbUp(float Value);
 
+	void ClimbDown(float Value);
+
 	void ClimbSide(float Value);
 
 private:

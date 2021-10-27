@@ -98,7 +98,14 @@ void UJungleKnightMovement::ReceiveForwardInput(float Value)
 		WalkForward(Value);
 		break;
 	case EKS_Climbing:
-		ClimbUp(Value);
+		if (Value > 0)
+		{
+			ClimbUp(Value);
+		}
+		else
+		{
+			ClimbDown(Value);
+		}
 		break;
 	}
 }
@@ -114,6 +121,9 @@ void UJungleKnightMovement::ReceiveRightInput(float Value)
 	{
 	case EKS_Walking:
 		WalkRight(Value);
+		break;
+	case EKS_Climbing:
+		ClimbSide(Value);
 		break;
 	}
 }
@@ -216,12 +226,74 @@ void UJungleKnightMovement::ClimbUp(float Value)
 
 	else
 	{
+		bOnClimbLedge = false;
 		LastClimbNormal = Hit.ImpactNormal;
 		AddInputVector(FVector::UpVector * Value);
 	}
 }
 
+void UJungleKnightMovement::ClimbDown(float Value)
+{
+	FHitResult Hit;
+	FCollisionQueryParams QueryParams;
+	QueryParams.AddIgnoredActor(GetOwner());
+
+	//Good enough
+	const float Epsilon = 5.f;
+
+	const float HalfHeight = GetCharacterOwner()->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+
+	const FVector Start = GetActorLocation() + FVector(0, 0, -HalfHeight);
+	FVector End = Start + (FVector::DownVector * Epsilon);
+
+	bool bHit = GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Pawn, QueryParams);
+
+	if (bHit)
+	{
+		//We climbed down into an object (like the ground)
+
+		return;
+	}
+
+	const float Radius = GetCharacterOwner()->GetCapsuleComponent()->GetScaledCapsuleRadius();
+	End = Start + (GetOwner()->GetActorForwardVector() * Epsilon);
+
+	bHit = GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Pawn, QueryParams);
+
+	//There is still room to climb down, move down
+	if(bHit)
+	{
+		LastClimbNormal = Hit.ImpactNormal;
+		AddInputVector(FVector::DownVector * Value);
+	}
+}
+
 void UJungleKnightMovement::ClimbSide(float Value)
 {
+	FHitResult Hit;
+	FCollisionQueryParams QueryParams;
+	QueryParams.AddIgnoredActor(GetOwner());
 
+	//Good enough
+	const float Epsilon = 5.f;
+	FVector MoveDirection = GetOwner()->GetActorRightVector();
+
+	if (Value < 0)
+	{
+		MoveDirection *= -1;
+	}
+
+	const float Radius = GetCharacterOwner()->GetCapsuleComponent()->GetScaledCapsuleRadius();
+
+	const FVector Start = GetActorLocation() + MoveDirection;
+	const FVector End = Start + (GetOwner()->GetActorForwardVector() * (Radius + Epsilon));
+
+	bool bHit = GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Pawn, QueryParams);
+
+	//There is still room to climb sideways, move over
+	if (bHit)
+	{
+		LastClimbNormal = Hit.ImpactNormal;
+		AddInputVector(MoveDirection * Value);
+	}
 }
