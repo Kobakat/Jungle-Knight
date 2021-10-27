@@ -270,6 +270,12 @@ void UJungleKnightMovement::ClimbDown(float Value)
 
 void UJungleKnightMovement::ClimbSide(float Value)
 {
+	const FRotator Rotation = Controller->GetControlRotation();
+	const FRotator YawRotation(0, Rotation.Yaw, 0);
+	const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+
+	const float Actual = (Direction ^ GetOwner()->GetActorForwardVector()).Z;
+
 	FHitResult Hit;
 	FCollisionQueryParams QueryParams;
 	QueryParams.AddIgnoredActor(GetOwner());
