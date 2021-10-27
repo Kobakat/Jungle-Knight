@@ -10,7 +10,6 @@ void UKnightAnimInstance::SetAnalogWeight()
 	}	
 }
 
-
 void UKnightAnimInstance::SetAnalogDirection()
 {
 	if (Movement != nullptr)

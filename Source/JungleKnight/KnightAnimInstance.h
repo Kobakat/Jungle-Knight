@@ -12,9 +12,6 @@ class JUNGLEKNIGHT_API UKnightAnimInstance : public UAnimInstance
 {
 	GENERATED_BODY()
 
-public:
-	UKnightAnimInstance() { }
-
 protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Animation Parameters")

@@ -52,6 +52,9 @@ Plugins/*/Binaries/*
 # Builds
 Build/*
 
+# Asset pack
+Content/PN_interactiveSpruceForest*
+
 # Whitelist PakBlacklist-<BuildConfiguration>.txt files
 !Build/*/
 Build/*/**
